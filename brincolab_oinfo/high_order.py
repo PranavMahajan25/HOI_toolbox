@@ -1,3 +1,6 @@
+# Original code in MATLAB (https://github.com/brincolab/High-Order-interactions)
+# Translated to Python by Pranav Mahajan, 2021
+
 # Code description: Function to compute S-Information, O-Information, and characterize the High-order interactions among n variables governed by Redundancy or Synergy.
 # Input: - 'data': Matrix with dimensionality (N,T), where N is the number of brain regions or modules, and T is the number of samples.
 #        - 'n': number of interactions or n-plets. n must be greater or equal, and if n=3, then the interactions is among triplets. 

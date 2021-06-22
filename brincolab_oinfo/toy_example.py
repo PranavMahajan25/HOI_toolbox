@@ -2,9 +2,10 @@
 
 import numpy as np
 
-from Oinfo import exhaustive_loop_zerolag
-# from dOinfo import exhaustive_loop_lagged
+from high_order import high_order
 
+N = 5
+T = 10
 
 dataPatient = np.array([
     [0.5377,   -1.3077,   -1.3499,   -0.2050,    0.6715,    1.0347,    0.8884,    1.4384,   -0.1022,   -0.0301],
@@ -14,6 +15,8 @@ dataPatient = np.array([
     [0.3188,    2.7694,    0.7147,    1.4172,    0.4889,   -0.7873,   -2.9443,   -1.7115,   -0.8649,    1.1093]
 ])
 
+n=3
 
-exhaustive_loop_zerolag(dataPatient)
+Oinfo, Sinfo, Red, Syn = high_order(dataPatient, n)
 
+print(Oinfo, Sinfo, Red, Syn)
