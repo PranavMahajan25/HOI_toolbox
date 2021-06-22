@@ -54,8 +54,8 @@ def exhaustive_loop_zerolag(ts):
         
         if Osort_pos.size != 0:
             n_sel = min(n_best, len(Osort_pos))
-            sorted_red = Osort_pos[0:n_sel]
-            index_red = ind_pos[ind_pos_sort[0:n_sel]].flatten()
+            sorted_red = Osort_pos[::-1][0:n_sel]
+            index_red = ind_pos[ind_pos_sort[::-1][0:n_sel]].flatten()
         if Osort_neg.size != 0:
             n_sel = min(n_best, len(Osort_neg))
             sorted_syn = Osort_neg[0:n_sel]
