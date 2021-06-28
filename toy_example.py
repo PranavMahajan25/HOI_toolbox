@@ -1,9 +1,10 @@
 # Author: Pranav Mahajan, 2021
 
 import numpy as np
+import scipy.io
 
 from Oinfo import exhaustive_loop_zerolag
-# from dOinfo import exhaustive_loop_lagged
+from dOinfo import exhaustive_loop_lagged
 
 
 dataPatient = np.array([
@@ -14,6 +15,11 @@ dataPatient = np.array([
     [0.3188,    2.7694,    0.7147,    1.4172,    0.4889,   -0.7873,   -2.9443,   -1.7115,   -0.8649,    1.1093]
 ])
 
+print(dataPatient.shape)
 
-exhaustive_loop_zerolag(dataPatient)
+ts = scipy.io.loadmat('ts.mat')
+ts = np.array(ts['ts'])
+ts = ts[:, :5].T
+
+exhaustive_loop_lagged(ts)
 

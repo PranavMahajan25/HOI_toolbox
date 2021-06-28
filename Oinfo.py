@@ -6,7 +6,8 @@ def o_information_boot(X, indsample, indvar):
     # this function takes the whole X as input, and additionally the indices
     # convenient for bootstrap
     # X size is M(variables) x N (samples)
-    print(X.shape)
+    
+    # print(X.shape)
     X = X[indvar,:]
     X = X[:, indsample]
 
@@ -21,9 +22,9 @@ def o_information_boot(X, indsample, indvar):
 def exhaustive_loop_zerolag(ts):
     print(ts.shape)
     Xfull = copnorm(ts)
-    print(Xfull)
+    # print(Xfull)
     nvartot, N = Xfull.shape
-    print(nvartot, N)
+    # print(nvartot, N)
     X = Xfull
     maxsize = 3 # max number of variables in the multiplet
     n_best = 10 # number of most informative multiplets retained
@@ -31,13 +32,15 @@ def exhaustive_loop_zerolag(ts):
     alphaval = 0.05
     o_b = np.zeros((nboot,1))
 
+    # this section is for the expansion of redundancy, so maximizing the O
+    # there's no need to fix the target here
     for isize in range(3,maxsize+1):
         nplets_iter=itertools.combinations(range(1,nvartot+1),isize)
         nplets = []
         for nplet in nplets_iter:
             nplets.append(nplet)
         C = np.array(nplets) # n-tuples without repetition over N modules
-        print(C)
+        # print(C)
         ncomb = C.shape[0]
         print(ncomb)
         Osize = np.zeros(ncomb)

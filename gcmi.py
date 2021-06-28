@@ -590,6 +590,55 @@ def gccmi_ccc(x,y,z):
     I = cmi_ggg(cx,cy,cz,True,True)
     return I
 
+def gccmi_ccc_nocopnorm(x,y,z):
+    # DOES NOT DO COPULA NORMALIZATION, YOU'RE SUPPOSED TO DO IT IN ADVANCE
+    """Gaussian-Copula CMI between three continuous variables.
+
+    I = gccmi_ccc(x,y,z) returns the CMI between two (possibly multidimensional)
+    continuous variables, x and y, conditioned on a third, z, estimated via a
+    Gaussian copula.
+    If x and/or y are multivariate columns must correspond to samples, rows
+    to dimensions/variables. (Samples first axis)
+
+    """
+
+    x = np.atleast_2d(x)
+    y = np.atleast_2d(y)
+    z = np.atleast_2d(z)
+    if x.ndim > 2 or y.ndim > 2 or z.ndim > 2:
+        raise ValueError("x, y and z must be at most 2d")
+
+    Ntrl = x.shape[1]
+    Nvarx = x.shape[0]
+    Nvary = y.shape[0]
+    Nvarz = z.shape[0]
+
+    if y.shape[1] != Ntrl or z.shape[1] != Ntrl:
+        raise ValueError("number of trials do not match")
+
+    # # check for repeated values
+    # for xi in range(Nvarx):
+    #     if (np.unique(x[xi,:]).size / float(Ntrl)) < 0.9:
+    #         warnings.warn("Input x has more than 10% repeated values")
+    #         break
+    # for yi in range(Nvary):
+    #     if (np.unique(y[yi,:]).size / float(Ntrl)) < 0.9:
+    #         warnings.warn("Input y has more than 10% repeated values")
+    #         break
+    # for zi in range(Nvarz):
+    #     if (np.unique(z[zi,:]).size / float(Ntrl)) < 0.9:
+    #         warnings.warn("Input y has more than 10% repeated values")
+    #         break
+
+    # # copula normalization
+    # cx = copnorm(x)
+    # cy = copnorm(y)
+    # cz = copnorm(z)
+
+    # parametric Gaussian CMI
+    I = cmi_ggg(x,y,z,True,True)
+    return I
+
 
 def gccmi_ccd(x,y,z,Zm):
     """Gaussian-Copula CMI between 2 continuous variables conditioned on a discrete variable.
