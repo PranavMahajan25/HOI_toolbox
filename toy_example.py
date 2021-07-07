@@ -15,11 +15,12 @@ dataPatient = np.array([
     [0.3188,    2.7694,    0.7147,    1.4172,    0.4889,   -0.7873,   -2.9443,   -1.7115,   -0.8649,    1.1093]
 ])
 
-print(dataPatient.shape)
+# print(dataPatient.shape)  
 
 ts = scipy.io.loadmat('ts.mat')
 ts = np.array(ts['ts'])
 ts = ts[:, :5].T
 
-exhaustive_loop_lagged(ts)
+exhaustive_loop_zerolag(ts)
+# exhaustive_loop_lagged(ts)
 

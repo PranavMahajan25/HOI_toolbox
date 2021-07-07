@@ -2,6 +2,7 @@ import numpy as np
 import itertools
 
 from gcmi import copnorm, gccmi_ccc_nocopnorm
+from utils import bootci
 
 def o_information_lagged_boot(Y,X,m,indstart,chunklength,indvar):
     # evaluates the o_information flow
@@ -19,11 +20,11 @@ def o_information_lagged_boot(Y,X,m,indstart,chunklength,indvar):
         for istart in range(nchunks):
             indsample[(istart)*chunklength:(istart+1)*chunklength] = np.arange(indstart[istart],indstart[istart]+chunklength)
             
-    
+    indsample = indsample.astype('int32')
     
     # print(indvar)
     # print(X.shape, Y.shape, indsample.shape)
-
+    
     Y = Y[indsample]
     X = X[indsample, :]
     X = X[:, indvar]
@@ -65,6 +66,7 @@ def exhaustive_loop_lagged(ts):
     maxsize = 3 # max number of variables in the multiplet
     n_best = 10 # number of most informative multiplets retained
     nboot = 100 # number of bootstrap samples
+    chunklength = round(N/5); #can play around with this
     alphaval = 0.05
     o_b = np.zeros((nboot,1))
 
@@ -91,16 +93,34 @@ def exhaustive_loop_lagged(ts):
             ind_neg = np.argwhere(Osize<0)
             O_pos = Osize[Osize>0]
             O_neg = Osize[Osize<0]
-            Osort_pos , ind_pos_sort = np.sort(O_pos), np.argsort(O_pos)
+            Osort_pos , ind_pos_sort = np.sort(O_pos)[::-1], np.argsort(O_pos)[::-1]
             Osort_neg , ind_neg_sort = np.sort(O_neg), np.argsort(O_neg)
             
             if Osort_pos.size != 0:
                 n_sel = min(n_best, len(Osort_pos))
-                sorted_red = Osort_pos[::-1][0:n_sel]
-                index_red = ind_pos[ind_pos_sort[::-1][0:n_sel]].flatten()
+                boot_sig = np.zeros((n_sel, 1))
+                for isel in range(n_sel):
+                    indvar=np.squeeze(C[ind_pos[ind_pos_sort[isel]],:])
+                    print(indvar)
+                    f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1)
+                    ci_lower, ci_upper = bootci(nboot, f, np.arange(N), alphaval)
+                    print(ci_lower, ci_upper)
+                    boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) # bias correction?
+                sorted_red = Osort_pos[0:n_sel]
+                index_red = ind_pos[ind_pos_sort[0:n_sel]].flatten()
+                bootsig_red = boot_sig
             if Osort_neg.size != 0:
                 n_sel = min(n_best, len(Osort_neg))
+                boot_sig = np.zeros((n_sel, 1))
+                for isel in range(n_sel):
+                    indvar=np.squeeze(C[ind_neg[ind_neg_sort[isel]],:])
+                    print(indvar)
+                    f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1)
+                    ci_lower, ci_upper = bootci(nboot, f, np.arange(N), alphaval)
+                    print(ci_lower, ci_upper)
+                    boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) # bias correction?
                 sorted_syn = Osort_neg[0:n_sel]
                 index_syn = ind_neg[ind_neg_sort[0:n_sel]].flatten()
+                bootsig_syn = boot_sig
 
-            print(Osize, sorted_red, index_red, sorted_syn, index_syn)
+            print(Osize, sorted_red, index_red, bootsig_red, sorted_syn, index_syn, bootsig_syn)

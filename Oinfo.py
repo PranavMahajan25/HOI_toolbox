@@ -1,6 +1,8 @@
 import numpy as np
 import itertools
+import sys
 from gcmi import copnorm, ent_g
+from utils import bootci
 
 def o_information_boot(X, indsample, indvar):
     # this function takes the whole X as input, and additionally the indices
@@ -52,18 +54,36 @@ def exhaustive_loop_zerolag(ts):
         ind_neg = np.argwhere(Osize<0)
         O_pos = Osize[Osize>0]
         O_neg = Osize[Osize<0]
-        Osort_pos , ind_pos_sort = np.sort(O_pos), np.argsort(O_pos)
+        Osort_pos , ind_pos_sort = np.sort(O_pos)[::-1], np.argsort(O_pos)[::-1]
         Osort_neg , ind_neg_sort = np.sort(O_neg), np.argsort(O_neg)
         
         if Osort_pos.size != 0:
             n_sel = min(n_best, len(Osort_pos))
-            sorted_red = Osort_pos[::-1][0:n_sel]
-            index_red = ind_pos[ind_pos_sort[::-1][0:n_sel]].flatten()
+            boot_sig = np.zeros((n_sel, 1))
+            for isel in range(n_sel):
+                indvar=np.squeeze(C[ind_pos[ind_pos_sort[isel]],:])
+                print(indvar)
+                f = lambda xsamp: o_information_boot(X, xsamp, indvar-1)
+                ci_lower, ci_upper = bootci(nboot, f, range(N), alphaval)
+                print(ci_lower, ci_upper)
+                boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) # bias correction?
+            sorted_red = Osort_pos[0:n_sel]
+            index_red = ind_pos[ind_pos_sort[0:n_sel]].flatten()
+            bootsig_red = boot_sig
         if Osort_neg.size != 0:
             n_sel = min(n_best, len(Osort_neg))
+            boot_sig = np.zeros((n_sel, 1))
+            for isel in range(n_sel):
+                indvar=np.squeeze(C[ind_neg[ind_neg_sort[isel]],:])
+                print(indvar)
+                f = lambda xsamp: o_information_boot(X, xsamp, indvar-1)
+                ci_lower, ci_upper = bootci(nboot, f, range(N), alphaval)
+                print(ci_lower, ci_upper)
+                boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) # bias correction?
             sorted_syn = Osort_neg[0:n_sel]
             index_syn = ind_neg[ind_neg_sort[0:n_sel]].flatten()
+            bootsig_syn = boot_sig
 
-        print(Osize, sorted_red, index_red, sorted_syn, index_syn)
+        print(Osize, sorted_red, index_red, bootsig_red, sorted_syn, index_syn, bootsig_syn)
 
     return Osize, sorted_red, index_red, sorted_syn, index_syn
