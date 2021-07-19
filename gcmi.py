@@ -22,7 +22,6 @@ def ctransform(x):
     cx = (xr+1).astype(np.float) / (xr.shape[-1]+1)
     return cx
  
-
 def copnorm(x):
     """Copula normalization
     
@@ -33,7 +32,6 @@ def copnorm(x):
     #cx = sp.stats.norm.ppf(ctransform(x))
     cx = sp.special.ndtri(ctransform(x))
     return cx
-
 
 def ent_g(x, biascorrect=True):
     """Entropy of a Gaussian variable in bits
@@ -55,6 +53,7 @@ def ent_g(x, biascorrect=True):
     # covariance
     C = np.dot(x,x.T) / float(Ntrl - 1)
     chC = np.linalg.cholesky(C)
+    # chC = sp.linalg.cholesky(C, lower=True) #alternative, but not any faster.
 
     # entropy in nats
     HX = np.sum(np.log(np.diagonal(chC))) + 0.5*Nvarx*(np.log(2*np.pi)+1.0)

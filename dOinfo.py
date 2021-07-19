@@ -1,8 +1,8 @@
 import numpy as np
 import itertools
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from gcmi import copnorm, gccmi_ccc_nocopnorm
-from utils import bootci
+from utils import bootci, combinations_manager, ncr
 
 def o_information_lagged_boot(Y,X,m,indstart,chunklength,indvar):
     # evaluates the o_information flow
@@ -53,7 +53,7 @@ def o_information_lagged_boot(Y,X,m,indstart,chunklength,indvar):
     return o
 
 
-def exhaustive_loop_lagged(ts):
+def exhaustive_loop_lagged(ts, higher_order = False):
     print("ts.shape: ", ts.shape)
     Xfull = copnorm(ts)
     # print(Xfull)
@@ -61,7 +61,7 @@ def exhaustive_loop_lagged(ts):
     # print(nvartot, N)
     X = Xfull.T
     modelorder = 3 # check this
-    maxsize = 6 # max number of variables in the multiplet
+    maxsize = 4 # max number of variables in the multiplet
     n_best = 10 # number of most informative multiplets retained
     nboot = 100 # number of bootstrap samples
     chunklength = round(N/5); #can play around with this
@@ -80,33 +80,69 @@ def exhaustive_loop_lagged(ts):
             for isize in tqdm(range(2,maxsize+1), disable=True):
                 Otot = {}
                 var_arr = np.setdiff1d(np.arange(1,nvartot+1), itarget+1)
-                nplets_iter=itertools.combinations(var_arr,isize)
-                nplets = []
-                for nplet in nplets_iter:
-                    nplets.append(nplet)
-                C = np.array(nplets) # n-tuples without repetition over N modules
-                # print(C)
-                ncomb = C.shape[0]
+                # print(var_arr)
+                if higher_order:
+                    H = combinations_manager(len(var_arr), isize)
+                    ncomb = ncr(len(var_arr), isize)
+                    O_pos = np.zeros(n_best)
+                    O_neg = np.zeros(n_best)
+                    ind_pos = np.zeros(n_best)
+                    ind_neg = np.zeros(n_best)
+                else:
+                    nplets_iter=itertools.combinations(var_arr,isize)
+                    nplets = []
+                    for nplet in nplets_iter:
+                        nplets.append(nplet)
+                    C = np.array(nplets) # n-tuples without repetition over N modules
+                    # print(C)
+                    ncomb = C.shape[0]
                 # print(ncomb)
                 Osize = np.zeros(ncomb)
 
                 for icomb in tqdm(range(ncomb), desc="Inner loop, computing O", leave=False):
-                    Osize[icomb] = o_information_lagged_boot(t, X, modelorder, np.arange(N), 0, C[icomb, :] - 1)
+                    if higher_order:
+                        comb = H.nextchoose()
+                        # print(var_arr[comb-1])
+                        Osize = o_information_lagged_boot(t, X, modelorder, np.arange(N), 0, var_arr[comb-1] - 1)
+                        valpos, ipos = np.min(O_pos), np.argmin(O_pos)
+                        valneg, ineg = np.max(O_neg), np.argmax(O_neg)
+                        if Osize>0 and Osize>valpos:
+                            O_pos[ipos] = Osize
+                            ind_pos[ipos] = H.combination2number(comb)
+                        if Osize<0 and Osize<valneg:
+                            O_neg[ineg] = Osize
+                            ind_neg[ineg] = H.combination2number(comb)
+                    else:
+                        comb = C[icomb, :]
+                        # print(comb)
+                        Osize[icomb] = o_information_lagged_boot(t, X, modelorder, np.arange(N), 0, comb - 1)
 
-                ind_pos = np.argwhere(Osize>0)
-                ind_neg = np.argwhere(Osize<0)
-                O_pos = Osize[Osize>0]
-                O_neg = Osize[Osize<0]
-                Osort_pos , ind_pos_sort = np.sort(O_pos)[::-1], np.argsort(O_pos)[::-1]
-                Osort_neg , ind_neg_sort = np.sort(O_neg), np.argsort(O_neg)
+                if higher_order:
+                    Osort_pos , ind_pos_sort = np.sort(O_pos)[::-1], np.argsort(O_pos)[::-1]
+                    Osort_neg , ind_neg_sort = np.sort(O_neg), np.argsort(O_neg)
+                else:
+                    ind_pos = np.argwhere(Osize>0)
+                    ind_neg = np.argwhere(Osize<0)
+                    O_pos = Osize[Osize>0]
+                    O_neg = Osize[Osize<0]
+                    Osort_pos , ind_pos_sort = np.sort(O_pos)[::-1], np.argsort(O_pos)[::-1]
+                    Osort_neg , ind_neg_sort = np.sort(O_neg), np.argsort(O_neg)
                 
                 if Osort_pos.size != 0:
                     n_sel = min(n_best, len(Osort_pos))
                     boot_sig = np.zeros((n_sel, 1))
                     for isel in range(n_sel):
-                        indvar=np.squeeze(C[ind_pos[ind_pos_sort[isel]],:])
+                        if higher_order:
+                            indvar=H.number2combination(ind_pos[ind_pos_sort[isel]])
+                            # print(ind_pos_sort[isel])
+                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, var_arr[indvar-1] - 1)
+                        else:
+                            indvar=np.squeeze(C[ind_pos[ind_pos_sort[isel]],:])
+                            # print(ind_pos[ind_pos_sort[isel]])
+                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1)
+
+                        # print(var_arr[indvar-1])
                         # print(indvar)
-                        f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1)
                         ci_lower, ci_upper = bootci(nboot, f, np.arange(N-chunklength+1), alphaval)
                         # print(ci_lower, ci_upper)
                         boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) # bias correction?
@@ -117,15 +153,22 @@ def exhaustive_loop_lagged(ts):
                     n_sel = min(n_best, len(Osort_neg))
                     boot_sig = np.zeros((n_sel, 1))
                     for isel in range(n_sel):
-                        indvar=np.squeeze(C[ind_neg[ind_neg_sort[isel]],:])
+                        if higher_order:
+                            indvar=H.number2combination(ind_neg[ind_neg_sort[isel]])
+                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, var_arr[indvar-1] - 1)
+                        else:
+                            indvar=np.squeeze(C[ind_neg[ind_neg_sort[isel]],:])
+                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1)
                         # print(indvar)
-                        f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1)
                         ci_lower, ci_upper = bootci(nboot, f, np.arange(N-chunklength+1), alphaval)
                         # print(ci_lower, ci_upper)
                         boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) # bias correction?
                     Otot['sorted_syn'] = Osort_neg[0:n_sel]
                     Otot['index_syn'] = ind_neg[ind_neg_sort[0:n_sel]].flatten()
                     Otot['bootsig_syn'] = boot_sig
+                Otot['var_arr'] = var_arr 
+                # to get back the combination of the max Redundancy do -
+                # var_arr[H.number2combination(H.Otot['index_red'][0])-1]
                 Otarget[isize] = Otot
                 pbar.update(1)
             Odict[itarget] = Otarget

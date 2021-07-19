@@ -11,10 +11,10 @@ from dOinfo import exhaustive_loop_lagged
 
 ts = scipy.io.loadmat('ts.mat')
 ts = np.array(ts['ts'])
-# ts = ts[:, :5].T # Change this to include more variables, currently including 5 variables
-ts = ts.T #This includes all the variables in the data
+ts = ts[:, :5].T # Change this to include more variables, currently including 5 or 10 variables
+# ts = ts.T #This includes all the variables in the data
 
-metric = 'Oinfo'
+metric = 'dOinfo'
 
 if metric == 'Oinfo':
     t = time.time()
@@ -37,3 +37,18 @@ if metric == 'dOinfo':
 # Examples on how to see the final output dict (equivalent of struct in MATLAB)
 # Odict_Oinfo[3]
 # Odict_dOinfo[0][2]
+
+
+# Examples on how the new combinations manager works
+# from utils import combinations_manager
+
+# H = combinations_manager(10,5)
+# for i in range(10):
+#     comb = H.nextchoose()
+#     num = H.combination2number(comb)
+#     comb_ret = H.number2combination(num) 
+#     print(comb)
+#     print(num)
+#     print(comb_ret)
+
+
