@@ -11,14 +11,14 @@ from dOinfo import exhaustive_loop_lagged
 
 ts = scipy.io.loadmat('ts.mat')
 ts = np.array(ts['ts'])
-ts = ts[:, :5].T # Change this to include more variables, currently including 5 or 10 variables
+ts = ts[:, :10].T # Change this to include more variables, currently including 5 or 10 variables
 # ts = ts.T #This includes all the variables in the data
 
 metric = 'dOinfo'
 
 if metric == 'Oinfo':
     t = time.time()
-    Odict = exhaustive_loop_zerolag(ts)
+    Odict = exhaustive_loop_zerolag(ts, frites=True)
     elapsed = time.time() - t
     print("Elapsed time is ", elapsed, " seconds.")
     save_obj(Odict, 'Odict_Oinfo')
@@ -27,7 +27,7 @@ if metric == 'Oinfo':
 
 if metric == 'dOinfo':
     t = time.time()
-    Odict = exhaustive_loop_lagged(ts)
+    Odict = exhaustive_loop_lagged(ts, frites=True)
     elapsed = time.time() - t
     print("Elapsed time is ", elapsed, " seconds.")
     save_obj(Odict, 'Odict_dOinfo')

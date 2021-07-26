@@ -2,9 +2,22 @@ import numpy as np
 import itertools
 from tqdm.auto import tqdm
 from gcmi import copnorm, gccmi_ccc_nocopnorm
+from frites.estimator.est_gcmi import GCMIEstimator
 from utils import bootci, combinations_manager, ncr
 
-def o_information_lagged_boot(Y,X,m,indstart,chunklength,indvar):
+def get_mi(A,B,C, frites):
+    if frites:
+        frites_estimator = GCMIEstimator(mi_type='ccc', copnorm=False, verbose=False)
+        Af = np.expand_dims(A,axis=0)
+        Bf = np.expand_dims(B,axis=0)
+        Cf = np.expand_dims(C,axis=0)
+        mi = frites_estimator.estimate(Af,Bf,Cf)
+        mi = mi[0][0]
+    else:
+        mi = gccmi_ccc_nocopnorm(A, B, C)
+    return mi
+
+def o_information_lagged_boot(Y,X,m,indstart,chunklength,indvar,frites):
     # evaluates the o_information flow
     # Y Nx1 target vector .  X NxM drivers
     # m order of the model
@@ -43,17 +56,18 @@ def o_information_lagged_boot(Y,X,m,indstart,chunklength,indvar):
     # print(X0_reshaped.shape)
     # print(y.shape)
     # print(Y0.shape)
-    o = - (M-1) * gccmi_ccc_nocopnorm(y, X0_reshaped, Y0)
+    
+    o = - (M-1) * get_mi(y, X0_reshaped, Y0, frites)
     
     for k in range(M):
         X = np.delete(X0, k, axis=2)
         X_reshaped = np.reshape(np.ravel(X, order='F'), (n, m*(M-1)), order='F').T
-        o=o+gccmi_ccc_nocopnorm(y, X_reshaped, Y0)
+        o=o+get_mi(y, X_reshaped, Y0, frites)
     # print(o)
     return o
 
 
-def exhaustive_loop_lagged(ts, higher_order = False):
+def exhaustive_loop_lagged(ts, higher_order = False, frites = False):
     print("ts.shape: ", ts.shape)
     Xfull = copnorm(ts)
     # print(Xfull)
@@ -103,7 +117,7 @@ def exhaustive_loop_lagged(ts, higher_order = False):
                     if higher_order:
                         comb = H.nextchoose()
                         # print(var_arr[comb-1])
-                        Osize = o_information_lagged_boot(t, X, modelorder, np.arange(N), 0, var_arr[comb-1] - 1)
+                        Osize = o_information_lagged_boot(t, X, modelorder, np.arange(N), 0, var_arr[comb-1] - 1, frites)
                         valpos, ipos = np.min(O_pos), np.argmin(O_pos)
                         valneg, ineg = np.max(O_neg), np.argmax(O_neg)
                         if Osize>0 and Osize>valpos:
@@ -115,7 +129,7 @@ def exhaustive_loop_lagged(ts, higher_order = False):
                     else:
                         comb = C[icomb, :]
                         # print(comb)
-                        Osize[icomb] = o_information_lagged_boot(t, X, modelorder, np.arange(N), 0, comb - 1)
+                        Osize[icomb] = o_information_lagged_boot(t, X, modelorder, np.arange(N), 0, comb - 1, frites)
 
                 if higher_order:
                     Osort_pos , ind_pos_sort = np.sort(O_pos)[::-1], np.argsort(O_pos)[::-1]
@@ -135,11 +149,11 @@ def exhaustive_loop_lagged(ts, higher_order = False):
                         if higher_order:
                             indvar=H.number2combination(ind_pos[ind_pos_sort[isel]])
                             # print(ind_pos_sort[isel])
-                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, var_arr[indvar-1] - 1)
+                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, var_arr[indvar-1] - 1, frites)
                         else:
                             indvar=np.squeeze(C[ind_pos[ind_pos_sort[isel]],:])
                             # print(ind_pos[ind_pos_sort[isel]])
-                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1)
+                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1, frites)
 
                         # print(var_arr[indvar-1])
                         # print(indvar)
@@ -155,10 +169,10 @@ def exhaustive_loop_lagged(ts, higher_order = False):
                     for isel in range(n_sel):
                         if higher_order:
                             indvar=H.number2combination(ind_neg[ind_neg_sort[isel]])
-                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, var_arr[indvar-1] - 1)
+                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, var_arr[indvar-1] - 1, frites)
                         else:
                             indvar=np.squeeze(C[ind_neg[ind_neg_sort[isel]],:])
-                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1)
+                            f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1, frites)
                         # print(indvar)
                         ci_lower, ci_upper = bootci(nboot, f, np.arange(N-chunklength+1), alphaval)
                         # print(ci_lower, ci_upper)
