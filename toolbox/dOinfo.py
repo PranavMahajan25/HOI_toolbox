@@ -1,8 +1,8 @@
 import numpy as np
 import itertools
 from tqdm.auto import tqdm
-from gcmi import copnorm, gccmi_ccc_nocopnorm
-from utils import bootci, combinations_manager, ncr
+from toolbox.gcmi import copnorm, gccmi_ccc_nocopnorm
+from toolbox.utils import bootci, combinations_manager, ncr
 
 def o_information_lagged_boot(Y,X,m,indstart,chunklength,indvar):
     # evaluates the o_information flow

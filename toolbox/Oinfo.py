@@ -1,8 +1,8 @@
 import numpy as np
 import itertools
 from tqdm.auto import tqdm
-from gcmi import copnorm, ent_g
-from utils import bootci, combinations_manager, ncr
+from toolbox.gcmi import copnorm, ent_g
+from toolbox.utils import bootci, combinations_manager, ncr
 
 
 def o_information_boot(X, indsample, indvar):

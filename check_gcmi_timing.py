@@ -1,6 +1,6 @@
 import numpy as np
 import time
-from gcmi import copnorm, gccmi_ccc_nocopnorm, ent_g
+from toolbox.gcmi import copnorm, gccmi_ccc_nocopnorm, ent_g
 
 
 N = 10000 # 817

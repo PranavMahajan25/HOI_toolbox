@@ -1,0 +1,5 @@
+{
+	"input_type": "tsv",	
+	"input": "data/timeseries.tsv.gz",
+	"metric": "Oinfo"
+}

@@ -3,13 +3,14 @@
 import numpy as np
 import scipy.io
 import time
+import os
 
-from utils import save_obj, load_obj
-from Oinfo import exhaustive_loop_zerolag
-from dOinfo import exhaustive_loop_lagged
+from toolbox.utils import save_obj, load_obj
+from toolbox.Oinfo import exhaustive_loop_zerolag
+from toolbox.dOinfo import exhaustive_loop_lagged
 
 
-ts = scipy.io.loadmat('ts.mat')
+ts = scipy.io.loadmat(os.path.join('data','ts.mat'))
 ts = np.array(ts['ts'])
 ts = ts[:, :5].T # Change this to include more variables, currently including 5 or 10 variables
 # ts = ts.T #This includes all the variables in the data
