@@ -1,11 +1,23 @@
+import sys
 import numpy as np
 import itertools
 from tqdm.auto import tqdm
 from toolbox.gcmi import copnorm, ent_g
+from toolbox.lin_est import lin_ent
 from toolbox.utils import bootci, combinations_manager, ncr
 
 
-def o_information_boot(X, indsample, indvar):
+def get_ent(X, estimator):
+    if estimator=='lin_est':
+        entropy = lin_ent(X)
+    elif estimator=='gcmi':
+        entropy = ent_g(X)
+    else:
+        print("Please use estimator out of the following - 'lin_est' or 'gcmi'")
+        sys.exit()
+    return entropy
+
+def o_information_boot(X, indsample, indvar, estimator):
     # this function takes the whole X as input, and additionally the indices
     # convenient for bootstrap
     # X size is M(variables) x N (samples)
@@ -15,14 +27,15 @@ def o_information_boot(X, indsample, indvar):
     X = X[:, indsample]
 
     M,N = X.shape
-    o = (M-2) * ent_g(X)
+    o = (M-2) * get_ent(X, estimator)
+    
     for j in range(M):
         X1 = np.delete(X, j, axis=0)
-        o = o + ent_g(X[j,:]) - ent_g(X1)
+        o = o + get_ent(X[j,:], estimator) - get_ent(X1, estimator)
     return o
 
 
-def exhaustive_loop_zerolag(ts, higher_order = False):
+def exhaustive_loop_zerolag(ts, higher_order = False, estimator = 'gcmi'):
     print("ts.shape: ", ts.shape)
     Xfull = copnorm(ts)
     # print(Xfull)
@@ -65,7 +78,7 @@ def exhaustive_loop_zerolag(ts, higher_order = False):
             for icomb in tqdm(range(ncomb), desc="Inner loop, computing O", leave=False):
                 if higher_order:
                     comb = H.nextchoose()
-                    Osize= o_information_boot(X, range(N), comb - 1)
+                    Osize= o_information_boot(X, range(N), comb - 1, estimator)
                     valpos, ipos = np.min(O_pos), np.argmin(O_pos)
                     valneg, ineg = np.max(O_neg), np.argmax(O_neg)
                     if Osize>0 and Osize>valpos:
@@ -76,7 +89,7 @@ def exhaustive_loop_zerolag(ts, higher_order = False):
                         ind_neg[ineg] = H.combination2number(comb)
                 else:
                     comb = C[icomb, :]
-                    Osize[icomb] = o_information_boot(X, range(N), comb - 1)
+                    Osize[icomb] = o_information_boot(X, range(N), comb - 1, estimator)
                 # print(comb)    
 
             if higher_order:
@@ -101,10 +114,10 @@ def exhaustive_loop_zerolag(ts, higher_order = False):
                         indvar=np.squeeze(C[ind_pos[ind_pos_sort[isel]],:])
                         # print(ind_pos[ind_pos_sort[isel]])
                     # print(indvar)
-                    f = lambda xsamp: o_information_boot(X, xsamp, indvar-1)
+                    f = lambda xsamp: o_information_boot(X, xsamp, indvar-1, estimator)
                     ci_lower, ci_upper = bootci(nboot, f, range(N), alphaval)
                     # print(ci_lower, ci_upper)
-                    boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) # bias correction?
+                    boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) 
                 Otot['sorted_red'] = Osort_pos[0:n_sel]
                 Otot['index_red'] = ind_pos[ind_pos_sort[0:n_sel]].flatten()
                 Otot['bootsig_red'] = boot_sig
@@ -117,10 +130,10 @@ def exhaustive_loop_zerolag(ts, higher_order = False):
                     else:
                         indvar=np.squeeze(C[ind_neg[ind_neg_sort[isel]],:])
                     # print(indvar)
-                    f = lambda xsamp: o_information_boot(X, xsamp, indvar-1)
+                    f = lambda xsamp: o_information_boot(X, xsamp, indvar-1, estimator)
                     ci_lower, ci_upper = bootci(nboot, f, range(N), alphaval)
                     # print(ci_lower, ci_upper)
-                    boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) # bias correction?
+                    boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) 
                 Otot['sorted_syn'] = Osort_neg[0:n_sel]
                 Otot['index_syn'] = ind_neg[ind_neg_sort[0:n_sel]].flatten()
                 Otot['bootsig_syn'] = boot_sig

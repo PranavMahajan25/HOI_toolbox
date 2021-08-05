@@ -1,3 +1,4 @@
+import os
 import sys
 import pickle
 import numpy as np
@@ -20,6 +21,8 @@ def bootci(nboot, oinfo_func, xsamp_range, alpha):
 
 
 def save_obj(obj, name):
+    if not os.path.exists('output'):
+        os.makedirs('output')
     with open('output/'+ name + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
 
