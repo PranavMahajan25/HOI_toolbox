@@ -3,6 +3,7 @@
 import numpy as np
 from numpy import genfromtxt
 import scipy.io
+import pandas as pd
 import time
 import json
 import sys
@@ -43,8 +44,11 @@ else:
 
 
 if input_type=="tsv":
-	ts = genfromtxt(timeseriesFilename, delimiter='\t', )
-	ts = ts[1:,:].T
+	df = pd.read_csv("data/timeseries.tsv.gz", compression='gzip', delimiter='\t')
+	df = df.loc[:, (df != 0.0).any(axis=0)]
+	df.to_csv('data/cleaned_timeseries.tsv', sep='\t',index=False)
+	ts = genfromtxt('data/cleaned_timeseries.tsv', delimiter='\t', )
+	ts = ts[1:,:10].T # 101 variables, 152 timepoints
 	# print(ts.shape)
 elif input_type=="mat":
 	ts = scipy.io.loadmat(timeseriesFilename)
@@ -55,18 +59,18 @@ else:
 	print("Unknown input type")
 	sys.exit()
 
-if metric == 'Oinfo':
+if metric == "Oinfo":
     t = time.time()
-    Odict = exhaustive_loop_zerolag(ts)
+    Odict = exhaustive_loop_zerolag(ts, config)
     elapsed = time.time() - t
     print("Elapsed time is ", elapsed, " seconds.")
     save_obj(Odict, 'Odict_Oinfo')
     Odict_Oinfo = load_obj('Odict_Oinfo')
     print(Odict_Oinfo)
 
-if metric == 'dOinfo':
+if metric == "dOinfo":
     t = time.time()
-    Odict = exhaustive_loop_lagged(ts)
+    Odict = exhaustive_loop_lagged(ts, config)
     elapsed = time.time() - t
     print("Elapsed time is ", elapsed, " seconds.")
     save_obj(Odict, 'Odict_dOinfo')

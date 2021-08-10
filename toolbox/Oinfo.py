@@ -35,21 +35,21 @@ def o_information_boot(X, indsample, indvar, estimator):
     return o
 
 
-def exhaustive_loop_zerolag(ts, higher_order = False, estimator = 'gcmi'):
-    print("ts.shape: ", ts.shape)
+def exhaustive_loop_zerolag(ts, config):
+    higher_order = config["higher_order"]
+    estimator = config["estimator"]
     Xfull = copnorm(ts)
-    # print(Xfull)
     nvartot, N = Xfull.shape
-    # print(nvartot, N)
+    print("Timeseries details - Number of variables: ", str(nvartot),", Number of timepoints: ", str(N))
+    print("Computing Oinfo using " + estimator + " estimator")
     X = Xfull
-    maxsize = 5 # max number of variables in the multiplet
-    n_best = 10 # number of most informative multiplets retained
-    nboot = 100 # number of bootstrap samples
+    maxsize = config["maxsize"] #5 # max number of variables in the multiplet
+    n_best = config["n_best"] #10 # number of most informative multiplets retained
+    nboot = config["nboot"] #100 # number of bootstrap samples
     alphaval = 0.05
     o_b = np.zeros((nboot,1))
 
     Odict = {}
-
     # this section is for the expansion of redundancy, so maximizing the O
     # there's no need to fix the target here
     bar_length = (maxsize+1-3)

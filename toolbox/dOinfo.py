@@ -66,17 +66,18 @@ def o_information_lagged_boot(Y,X,m,indstart,chunklength,indvar, estimator):
     return o
 
 
-def exhaustive_loop_lagged(ts, higher_order = False, estimator = 'gcmi'):
-    print("ts.shape: ", ts.shape)
+def exhaustive_loop_lagged(ts, config):
+    higher_order = config["higher_order"]
+    estimator = config["estimator"]
     Xfull = copnorm(ts)
-    # print(Xfull)
     nvartot, N = Xfull.shape
-    # print(nvartot, N)
+    print("Timeseries details - Number of variables: ", str(nvartot),", Number of timepoints: ", str(N))
+    print("Computing dOinfo using "+ estimator + " estimator")
     X = Xfull.T
-    modelorder = 3 # check this
-    maxsize = 4 # max number of variables in the multiplet
-    n_best = 10 # number of most informative multiplets retained
-    nboot = 100 # number of bootstrap samples
+    modelorder = config["modelorder"] #3 # check this
+    maxsize = config["maxsize"] #4 # max number of variables in the multiplet
+    n_best = config["n_best"] #10 # number of most informative multiplets retained
+    nboot = config["nboot"] #100 # number of bootstrap samples
     chunklength = round(N/5); #can play around with this
     alphaval = 0.05
     o_b = np.zeros((nboot,1))

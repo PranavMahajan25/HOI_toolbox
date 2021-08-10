@@ -1,5 +1,11 @@
 {
 	"input_type": "tsv",	
 	"input": "data/timeseries.tsv.gz",
-	"metric": "Oinfo"
+	"metric": "dOinfo",
+	"higher_order": true,
+	"estimator": "gcmi",
+	"modelorder":3,
+	"maxsize":4,
+	"n_best":10, 
+	"nboot":100
 }
