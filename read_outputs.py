@@ -188,6 +188,7 @@ print(Odict_Oinfo[isize])
 # The class combinations_manager in utils.py which implements this mapping (both combination to a number and the other way round) along with your nextchoose function. 
 # Using the nextchoose function to generate subsequent combinations is still faster than looping through say 1 to nCk and getting the combination for each number, 
 # so I continue to use the nextchoose function to generate nCk combinations in the main exhaustive loop
+# I've tried to illustrate it in a simple 5C3 example here - https://docs.google.com/spreadsheets/d/1A-JTEIu2pMHfYKUtrXUwUxDwllwveWbNJN0l2jB6vkA/edit?usp=sharing
 
 # Back from the detour, it's straightforward to retrieve the combination from the index using the combinations_manager
 # To get the 3-plet combination with highest redundancy (of 0.14653095)
