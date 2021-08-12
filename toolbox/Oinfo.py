@@ -70,9 +70,7 @@ def exhaustive_loop_zerolag(ts, config):
                 for nplet in nplets_iter:
                     nplets.append(nplet)
                 C = np.array(nplets) # n-tuples without repetition over N modules
-                # print(C)
                 ncomb = C.shape[0]
-            # print(ncomb)
             Osize = np.zeros(ncomb)
 
             for icomb in tqdm(range(ncomb), desc="Inner loop, computing O", leave=False):
@@ -89,8 +87,7 @@ def exhaustive_loop_zerolag(ts, config):
                         ind_neg[ineg] = H.combination2number(comb)
                 else:
                     comb = C[icomb, :]
-                    Osize[icomb] = o_information_boot(X, range(N), comb - 1, estimator)
-                # print(comb)    
+                    Osize[icomb] = o_information_boot(X, range(N), comb - 1, estimator)   
 
             if higher_order:
                 Osort_pos , ind_pos_sort = np.sort(O_pos)[::-1], np.argsort(O_pos)[::-1]
@@ -109,14 +106,10 @@ def exhaustive_loop_zerolag(ts, config):
                 for isel in range(n_sel):
                     if higher_order:
                         indvar=H.number2combination(ind_pos[ind_pos_sort[isel]])
-                        # print(ind_pos_sort[isel])
                     else:
                         indvar=np.squeeze(C[ind_pos[ind_pos_sort[isel]],:])
-                        # print(ind_pos[ind_pos_sort[isel]])
-                    # print(indvar)
                     f = lambda xsamp: o_information_boot(X, xsamp, indvar-1, estimator)
                     ci_lower, ci_upper = bootci(nboot, f, range(N), alphaval)
-                    # print(ci_lower, ci_upper)
                     boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) 
                 Otot['sorted_red'] = Osort_pos[0:n_sel]
                 Otot['index_red'] = ind_pos[ind_pos_sort[0:n_sel]].flatten()
@@ -129,10 +122,8 @@ def exhaustive_loop_zerolag(ts, config):
                         indvar=H.number2combination(ind_neg[ind_neg_sort[isel]])
                     else:
                         indvar=np.squeeze(C[ind_neg[ind_neg_sort[isel]],:])
-                    # print(indvar)
                     f = lambda xsamp: o_information_boot(X, xsamp, indvar-1, estimator)
                     ci_lower, ci_upper = bootci(nboot, f, range(N), alphaval)
-                    # print(ci_lower, ci_upper)
                     boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) 
                 Otot['sorted_syn'] = Osort_neg[0:n_sel]
                 Otot['index_syn'] = ind_neg[ind_neg_sort[0:n_sel]].flatten()

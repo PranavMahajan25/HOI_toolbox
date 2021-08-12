@@ -6,6 +6,8 @@ from toolbox.gcmi import copnorm, gccmi_ccc_nocopnorm, ent_g
 from toolbox.lin_est import lin_ent, lin_cmi_ccc
 
 
+## Check timing for entropy computation
+
 N = 10000 # 817
 
 # M = 3 to 6 variables
@@ -34,6 +36,8 @@ print(entropy)
 
 
 #####################
+## Check timing for conditional mutual information computation
+
 # N = 653
 
 # A = np.random.randn(1,N)

@@ -94,7 +94,6 @@ def exhaustive_loop_lagged(ts, config):
             for isize in tqdm(range(2,maxsize+1), disable=True):
                 Otot = {}
                 var_arr = np.setdiff1d(np.arange(1,nvartot+1), itarget+1)
-                # print(var_arr)
                 if higher_order:
                     H = combinations_manager(len(var_arr), isize)
                     ncomb = ncr(len(var_arr), isize)
@@ -107,15 +106,12 @@ def exhaustive_loop_lagged(ts, config):
                     nplets = []
                     for nplet in nplets_iter:
                         nplets.append(nplet)
-                    C = np.array(nplets) # n-tuples without repetition over N modules
-                    # print(C)
+                    C = np.array(nplets) # n-tuples without repetition over N modules                  
                     ncomb = C.shape[0]
-                # print(ncomb)
                 Osize = np.zeros(ncomb)
                 for icomb in tqdm(range(ncomb), desc="Inner loop, computing O", leave=False):
                     if higher_order:
                         comb = H.nextchoose()
-                        # print(var_arr[comb-1])
                         Osize = o_information_lagged_boot(t, X, modelorder, np.arange(N), 0, var_arr[comb-1] - 1, estimator)
                         valpos, ipos = np.min(O_pos), np.argmin(O_pos)
                         valneg, ineg = np.max(O_neg), np.argmax(O_neg)
@@ -127,7 +123,6 @@ def exhaustive_loop_lagged(ts, config):
                             ind_neg[ineg] = H.combination2number(comb)
                     else:
                         comb = C[icomb, :]
-                        # print(comb)
                         Osize[icomb] = o_information_lagged_boot(t, X, modelorder, np.arange(N), 0, comb - 1, estimator)
                 if higher_order:
                     Osort_pos , ind_pos_sort = np.sort(O_pos)[::-1], np.argsort(O_pos)[::-1]
@@ -145,17 +140,11 @@ def exhaustive_loop_lagged(ts, config):
                     for isel in range(n_sel):
                         if higher_order:
                             indvar=H.number2combination(ind_pos[ind_pos_sort[isel]])
-                            # print(ind_pos_sort[isel])
                             f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, var_arr[indvar-1] - 1, estimator)
                         else:
                             indvar=np.squeeze(C[ind_pos[ind_pos_sort[isel]],:])
-                            # print(ind_pos[ind_pos_sort[isel]])
                             f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1, estimator)
-
-                        # print(var_arr[indvar-1])
-                        # print(indvar)
                         ci_lower, ci_upper = bootci(nboot, f, np.arange(N-chunklength+1), alphaval)
-                        # print(ci_lower, ci_upper)
                         boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) 
                     Otot['sorted_red'] = Osort_pos[0:n_sel]
                     Otot['index_red'] = ind_pos[ind_pos_sort[0:n_sel]].flatten()
@@ -170,9 +159,7 @@ def exhaustive_loop_lagged(ts, config):
                         else:
                             indvar=np.squeeze(C[ind_neg[ind_neg_sort[isel]],:])
                             f = lambda xsamp: o_information_lagged_boot(t, X, modelorder, xsamp, chunklength, indvar - 1, estimator)
-                        # print(indvar)
                         ci_lower, ci_upper = bootci(nboot, f, np.arange(N-chunklength+1), alphaval)
-                        # print(ci_lower, ci_upper)
                         boot_sig[isel] = not(ci_lower<=0 and ci_upper > 0) 
                     Otot['sorted_syn'] = Osort_neg[0:n_sel]
                     Otot['index_syn'] = ind_neg[ind_neg_sort[0:n_sel]].flatten()
@@ -181,6 +168,7 @@ def exhaustive_loop_lagged(ts, config):
                 # In case of higher_order = True,
                 # to get back the combination of the max Redundancy do -
                 # var_arr[H.number2combination(H.Otot['index_red'][0])-1]
+                # more details in read_outputs.py
                 Otarget[isize] = Otot
                 pbar.update(1)
             Odict[itarget] = Otarget
