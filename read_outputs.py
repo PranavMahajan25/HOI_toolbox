@@ -7,6 +7,8 @@ import itertools
 
 from toolbox.utils import load_obj, combinations_manager
 
+## NOTE: If you face any issues with loading pickled outputs then use pickle5 instead of pickle in utils.py
+
 
 ## Case 1: argument higher_order = False. 
 # Pregenerating all possible combinations, not using the combinatorial numbering system.
@@ -21,8 +23,8 @@ from toolbox.utils import load_obj, combinations_manager
 
 # Run for both Oinfo and dOinfo and you will have generated outputs Odict_Oinfo.pkl and Odict_dOinfo.pkl
 # Load the dicts (equivalent of structs from MATLAB)
-Odict_Oinfo = load_obj('Odict_Oinfo')
-Odict_dOinfo = load_obj('Odict_dOinfo')
+Odict_Oinfo = load_obj('sample_Odict_Oinfo')
+Odict_dOinfo = load_obj('sample_Odict_dOinfo')
 
 
 print("Oinfo readout example, higher_order = False")
@@ -144,8 +146,8 @@ print("\n \n")
 # To follow along, use the same config as before but with higher_order = True and save the outputs
 
 # Loading the outputs
-Odict_Oinfo = load_obj('Odict_Oinfo_higher_order')
-Odict_dOinfo = load_obj('Odict_dOinfo_higher_order')
+Odict_Oinfo = load_obj('sample_Odict_Oinfo_higher_order')
+Odict_dOinfo = load_obj('sample_Odict_dOinfo_higher_order')
 
 
 print("Oinfo readout example, higher_order = True")

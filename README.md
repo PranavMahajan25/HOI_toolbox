@@ -35,7 +35,7 @@ A weekly progress of the GSOC project can be found in this [document](https://do
 
 
 # How to use this toolbox?
-You can either run the toolbox by running the docker, which would setup the necessary environment and run main.py or else you could install the libraries from requirements.txt and run main.py. You will need to mention things like path to the input data and it's datatype and all the arguments for the Oinfo and dOinfo code in the config.json before hand.
+If you are running on brainlife, it'll create a `config.json` or else if you are runnning locally you'll need to create a `config.json` by looking at `config-sample.json`. You can either run the toolbox by running the docker by just running `./main`, which would setup the necessary environment and run `main.py` with `config.json` as the argument or else you could install the libraries from `requirements.txt` and run `main.py`. You will need to mention things like path to the input data and it's datatype and all the arguments for the Oinfo and dOinfo code in the `config.json` before hand.
 
 # How to read and interpret the outputs? 
-Please refer to read_outputs.py for a detailed walkthrough through examples!
+Please refer to `read_outputs.py` for a detailed walkthrough through examples! It uses some sample outputs already generated and saved in `outputs` folder.
