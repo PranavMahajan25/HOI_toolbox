@@ -2,12 +2,12 @@
 High-order interactions toolbox 
 
 
-This repository includes a Python based toolbox on higher-order interactions such as O-information and dO-information which fills the greatest gap at the moment and  since these measures scale well with the number of time series involved. This work was done by Pranav Mahajan as a part of GSOC-2021 at INCF under the guidance and mentorship of Daniele Marinazzo and Fernando Rosas.
+This repository includes a Python based toolbox to compute higher-order interactions with metrics such as O-information and dO-information. These measures scale well with the number of time series involved. This work was done by Pranav Mahajan as a part of GSOC-2021 at INCF under the guidance and mentorship of Daniele Marinazzo and Fernando Rosas.
 
 
 #### The goals and deliverables achieved as a part of this work - 
-1. Implement a Python based implementation of Oinfo and dOinfo which computes redundancies and synergies, sorted in decreasing order along with their indices from which one extract the exact combination corresponding to the redundancy or synergy value and also check its significance by using bootstrapping
-2. Implements two distinct methods of indices: (1) All n-plet combinations precomputed in advance and stored in memory and (2) Each combination generated iteratively and mapped to a unique and unchanged index using the combinatorial numbering system, this helps extend to higher orders without running out of memory
+1. Implement a Python based implementation of Oinfo and dOinfo which computes redundancies and synergies, sorted in decreasing order along with their indices from which one can extract the exact combination of variables composing the multiplet with a specific redundancy or synergy value and also check its significance by using bootstrapping
+2. Implement two distinct methods of indexing: (1) All n-plet combinations precomputed in advance and stored in memory and (2) Each combination generated iteratively and mapped to a unique and unchanged index using the combinatorial numbering system, this helps extend to higher orders without running out of memory
 3. Implements two distinct estimators for computation of entropy and conditional mutual information in Oinfo and dOinfo respectively: (1) Gaussian Copula based estimators (based on Robin Ince's [gcmi](https://github.com/robince/gcmi)) and (2) Covariance matrix based linear estimators (implemented from scratch by refering to [ITS](http://www.lucafaes.net/its.html) and [MuTE](http://www.lucafaes.net/its.html))
 4. Dockerize the app for easy use with brainlife.io in the future
 5. Rigorously tested on timeseries data with variables less than 20.
@@ -35,7 +35,7 @@ A weekly progress of the GSOC project can be found in this [document](https://do
 
 
 # How to use this toolbox?
-If you are running on brainlife, it'll create a `config.json` or else if you are runnning locally you'll need to create a `config.json` by looking at `config-sample.json`. You can either run the toolbox by running the docker by just running `./main`, which would setup the necessary environment and run `main.py` with `config.json` as the argument or else you could install the libraries from `requirements.txt` and run `main.py`. You will need to mention things like path to the input data and it's datatype and all the arguments for the Oinfo and dOinfo code in the `config.json` before hand.
+If you are running on brainlife, it'll create a `config.json` or else if you are runnning locally you'll need to create a `config.json` by looking at `config-sample.json`. You can either run the toolbox by running the docker by just running `./main`, which would setup the necessary environment and run `main.py` with `config.json` as the argument or else you could install the libraries from `requirements.txt` and run `main.py`. You will need to mention things like path to the input data and its datatype and all the arguments for the Oinfo and dOinfo code in the `config.json` beforehand.
 
 # How to read and interpret the outputs? 
 Please refer to `read_outputs.py` for a detailed walkthrough through examples! It uses some sample outputs already generated and saved in `outputs` folder.
