@@ -1,21 +1,21 @@
 # HOI_toolbox
-High-order interactions toolbox 
+Higher-order interactions toolbox 
 
 
-This repository includes a unified Python-based toolbox to compute higher-order interactions with metrics such as [O-information](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.100.032305) and [dO-information](https://www.frontiersin.org/articles/10.3389/fphys.2020.595736/full). These measures scale well with the number of time series involved in comparison to most other metrics proposed so far to distinguish high-order features in the data. 
+This repository includes a unified Python-based toolbox to compute higher-order interactions with metrics such as [O-information](https://journals.aps.org/pre/abstract/10.1103/PhysRevE.100.032305) and [dO-information](https://www.frontiersin.org/articles/10.3389/fphys.2020.595736/full). These measures scale well with the number of time series involved in comparison to most other metrics proposed so far to distinguish higher-order features in the data. 
 
 ## Contents
-1. Introduction to high-order interactions
+1. Introduction to higher-order interactions
 2. What does the toolbox do? and how to use it?
 3. The past, the present and the future of the project
 
 
-# 1. Introduction to high-order interactions
+# 1. Introduction to higher-order interactions
 
-### What are high-order interactions and why should one use these measures?
+### What are higher-order interactions and why should one use these measures?
 
 The functioning of complex systems (i.e. the brain, and many others) depends on the interaction between different units; crucially, the resulting dynamics is different from the sum of the dynamics of the parts. What allows these systems to be more than the sum of their parts is not in the nature of the parts, but in the
-structure of their interdependencies. In order to deepen our understanding of these systems, we need to make sense of these interdependencies. Several tools and frameworks have been developed to look at different statistical dependencies among multivariate datasets. Among these, information theory offers a powerful and versatile framework; notably, it allows detecting high-order interactions that determine the joint informational role of a group of variables.
+structure of their interdependencies. In order to deepen our understanding of these systems, we need to make sense of these interdependencies. Several tools and frameworks have been developed to look at different statistical dependencies among multivariate datasets. Among these, information theory offers a powerful and versatile framework; notably, it allows detecting higher-order interactions that determine the joint informational role of a group of variables.
 
 Now these interactions amongst variables can either be synergestic or redundant, and O-information and dO-information provide us with scalable metrics which are capable of characterising synergy- and redundancy-dominated systems and whose computational complexity scales gracefully with system size, making it suitable for practical data
 analysis. 
@@ -48,7 +48,7 @@ For further details, readers are urged to read the papers on [O-information](htt
 
 ### What are the main deliverables of this toolbox?
 
-The goal of this toolbox is to collect and refine existing metrics of high-order interactions currently implemented in Matlab or Java, and integrate them in a unified python-based toolbox. The main deliverable of the project is a toolbox, whose inputs are the measurements of different variables plus some parameters, and whose outputs are the measures of higher-order interdependencies.
+The goal of this toolbox is to collect and refine existing metrics of higher-order interactions currently implemented in Matlab or Java, and integrate them in a unified python-based toolbox. The main deliverable of the project is a toolbox, whose inputs are the measurements of different variables plus some parameters, and whose outputs are the measures of higher-order interdependencies.
 
 ### How is this toolbox organized?
 The main codes for computing Oinfo and dOinfo are in  `./toolbox/Oinfo.py` and `./toolbox/dOinfo.py`. 
