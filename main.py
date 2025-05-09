@@ -44,9 +44,9 @@ else:
 
 
 if input_type=="tsv":
-	df = pd.read_csv("data/timeseries.tsv.gz", compression='gzip', delimiter='\t')
+	df = pd.read_csv(timeseriesFilename, compression='gzip', delimiter='\t')
 	df = df.loc[:, (df != 0.0).any(axis=0)]
-	df.to_csv('data/cleaned_timeseries.tsv', sep='\t',index=False)
+	df.to_csv('data/cleaned_timeseries.tsv', sep='\t', index=False)
 	ts = genfromtxt('data/cleaned_timeseries.tsv', delimiter='\t', )
 	ts = ts[1:,:].T # 101 variables, 152 timepoints
 	# print(ts.shape)
