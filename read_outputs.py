@@ -72,12 +72,18 @@ nplets_iter=itertools.combinations(range(1,nvartot+1),isize)
 nplets = []
 for nplet in nplets_iter:
     nplets.append(nplet)
-C = np.array(nplets) 
+C = np.array(nplets)
 
+best_red = int(Odict_Oinfo[isize]['index_red'][0])
+best_syn = int(Odict_Oinfo[isize]['index_syn'][0])
+
+print(C)
 # Now C will have all possible 10C3 combinations - 
 # That means the 2d array looks like [[ 1  2  3], [ 1  2  4],..., [ 7  9 10], [ 8  9 10]]
 # The combination at index 105 can be retrieved as follows
-print("Combination with highest redundancy:", C[105])
+print("Combination with highest redundancy:", C[best_red])
+print("Combination with highest synergy:", C[best_syn])
+
 # Which should output [5 7 9]
 
 print("\n \n")
@@ -133,8 +139,12 @@ for nplet in nplets_iter:
     nplets.append(nplet)
 C = np.array(nplets) # n-tuples without repetition over N modules
 
+best_red = int(Odict_dOinfo[target_var_index][isize]['index_red'][0])
+best_syn = int(Odict_dOinfo[target_var_index][isize]['index_syn'][0])
 
-print("Combination with highest redundancy:", C[22])
+print("Combination with highest redundancy:", C[best_red])
+print("Combination with highest synergy:", C[best_syn])
+
 # Which should output [ 5 7]
 print("\n \n")
 
@@ -197,8 +207,11 @@ print(Odict_Oinfo[isize])
 # We need to retrieve combination paired with combinatorial numbered index 75
 
 H = combinations_manager(nvartot,isize)
-print("Combination with highest redundancy:", H.number2combination(75))
+best_red = int(Odict_Oinfo[isize]['index_red'][0])
+best_syn = int(Odict_Oinfo[isize]['index_syn'][0])
+print("Combination with highest redundancy:", H.number2combination(best_red))
 # Which should output [5 7 9] which also obviously matches the output from higher_order = False
+print("Combination with highest synergy:", H.number2combination(best_syn))
 print("\n \n")
 
 
@@ -242,6 +255,9 @@ print(Odict_dOinfo[target_var_index][isize])
 # which lies in the combinatorial numbered index 13, do the following
 var_arr = Odict_dOinfo[target_var_index][isize]['var_arr']
 H = combinations_manager(nvartot,isize)
-print("Combination with highest redundancy:", var_arr[H.number2combination(13)-1])
+best_red = int(Odict_dOinfo[target_var_index][isize]['index_red'][0])
+best_syn = int(Odict_dOinfo[target_var_index][isize]['index_syn'][0])
+print("Combination with highest redundancy:", var_arr[H.number2combination(best_red)-1])
+print("Combination with highest synergy:", var_arr[H.number2combination(best_syn)-1])
 # Which should output [ 4 10]
 print("\n \n")
