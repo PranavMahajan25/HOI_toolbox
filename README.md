@@ -1,4 +1,49 @@
 # HOI_toolbox
+
+<!-- brainlife-app:begin (generated from the App manifest; edit the manifest, not this block) -->
+
+> **Computes higher-order interaction measures (O-information or dynamic O-information) over n-plets of time series with bootstrap significance, and outputs the top redundant and synergistic combinations.**
+
+Python toolbox from GSoC 2021 implementing O-information and dO-information with Gaussian-copula (gcmi) or linear covariance estimators, sweeping n-plet sizes up to maxsize. Use it on multivariate time series (tested with fewer than 20 variables). The main script builds and runs a Docker image, which brainlife compute resources generally do not allow, so the App may not run as registered.
+
+| | |
+|---|---|
+| 📥 **Inputs** | `generic/timeseries` |
+| 📤 **Outputs** | `raw` |
+| ⚙️ **Resources** | 1 CPUs |
+| 🔗 **Run it** | [doi.org/10.25663/brainlife.app.563](https://doi.org/10.25663/brainlife.app.563) |
+
+#### 📥 Inputs
+
+| Input | Datatype | Required | Description |
+|---|---|---|---|
+| `input_timeseries` | `generic/timeseries` (time series) | yes | The code takes data/timeseries.tsv.gz or data/ts.mat as input and outputs the pickle with redundancy and synergy metrics |
+
+#### 📤 Outputs
+
+| Output | Datatype | Description |
+|---|---|---|
+| `output` | `raw` | Output is a dict pickled and stored in the output directory. For more on how to read outputs please refer to read_outputs.py |
+
+<details>
+<summary><b>⚙️ Parameters</b> (9)</summary>
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `input_type` | string | `tsv` | Type of input data (can be tsv or mat) |
+| `input_path` | string | `data/timeseries.tsv.gz` | Path to input data |
+| `metric` | string | `Oinfo` | The metric you want to compute. Can be either Oinfo or dOinfo |
+| `higher_order` | boolean | `true` | Decides whether to adapt to code to enable higher orders without running out of memory. If set to true, generates combinations iteratively and can be retrieved using the combinatorial numbering system else it will precompute all of the combinations. |
+| `estimator` | string | `gcmi` | Decides which estimator to use for the backend - gcmi or lin_est |
+| `modelorder` | number | `3` | model order, only required in dOinfo computation not Oinfo |
+| `maxsize` | number | `4` | Max n-plet size to sweep till. |
+| `n_best` | number | `10` | Decides how many of the best redundancy and synergy combination outputs to save |
+| `nboot` | number | `100` | Number of bootstrap samples to be used, default 100 |
+
+</details>
+
+<!-- brainlife-app:end -->
+
 Higher-order interactions toolbox 
 
 
